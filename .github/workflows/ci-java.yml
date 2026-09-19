@@ -190,7 +190,12 @@ jobs:
             --rawfile cve_html cve-scan.html \
             '{ org: $org, repo: $repo, version: $version, environment: $environment, pipeline: "CI — Build & Test", metrics: $metrics, test_report_files: $test_report_files,
                reports: { unit_tests: $unit_html, integration_tests: $integration_html, coverage: $coverage_html, sast_scan: $sast_html, security: $cve_html } }')
-          curl -s -X POST "$SDLC_API_URL/api/evidence/upload" -H "Content-Type: application/json" -H "$AUTH_HEADER" -d "$PAYLOAD" || echo "Evidence upload failed (non-blocking)."
+          if ! curl --silent --show-error --fail-with-body \
+            --connect-timeout 10 --max-time 30 \
+            -X POST "$SDLC_API_URL/api/evidence/upload" \
+            -H "Content-Type: application/json" -H "$AUTH_HEADER" -d "$PAYLOAD"; then
+            echo "Evidence upload failed (non-blocking)."
+          fi
 
   tag:
     name: Auto-Tag on Push
