@@ -1,0 +1,5 @@
+target/
+coverage/
+*.html
+*.class
+.DS_Store
